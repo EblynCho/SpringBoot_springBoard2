@@ -47,4 +47,56 @@ public class BoardController {
         return "index";
     }
 
+    @RequestMapping(value="/board", method = RequestMethod.GET)
+    public ModelAndView openBoardList() throws Exception {
+        ModelAndView mv = new ModelAndView("board/restBoardList");
+
+        List<BoardDto> boardList = boardService.selectBoardList();
+        mv.addObject("boardList", boardList);
+
+        return mv;
+    }
+
+    //    아래의 writeBoard() 와 insertBoard() 메서드는 서로 매칭된 주소가 동일하지만 method 의 타입이 다르기 때문에 다르게 동작됨
+//    GET을 사용한 writeBoard() 메서드는 view 를 표현하고, POST 를 사용한 insertBoard() 메서드는 데이터를 추가함
+    @RequestMapping(value="/board/write", method = RequestMethod.GET)
+    public String writeBoard() throws Exception {
+        return "board/restWriteBoard";
+    }
+
+    @RequestMapping(value = "/board/write", method = RequestMethod.POST)
+    public String insertBoard(BoardDto board) throws Exception {
+        boardService.insertBoard(board);
+
+        return "redirect:/board";
+    }
+
+    //    @PathVariable : URI의 리소스가 메서드의 파라미터로 사용하는 어노테이션
+    @RequestMapping(value = "/board/{idx}", method = RequestMethod.GET)
+    public ModelAndView openBoardDetail(@PathVariable("idx") int idx) throws Exception {
+        ModelAndView mv = new ModelAndView("board/restBoardDetail");
+
+        BoardDto board = boardService.selectBoardDetail(idx);
+        mv.addObject("board", board);
+
+        return mv;
+    }
+
+    @RequestMapping(value = "/board/update/{idx}", method = RequestMethod.PUT)
+    public String updateBoard(BoardDto board) throws Exception {
+//        System.out.println("-------------------");
+//        System.out.println("updateBoard : " + board.getIdx());
+        boardService.updateBoard(board);
+
+        return "redirect:/board";
+    }
+
+    @RequestMapping(value = "/board/delete/{idx}", method = RequestMethod.DELETE)
+    public String deleteBoard(@PathVariable("idx") int idx) throws Exception {
+//        System.out.println("-------------------");
+//        System.out.println("deleteBoard : " + idx);
+        boardService.deleteBoard(idx);
+
+        return "redirect:/board";
+    }
 }
